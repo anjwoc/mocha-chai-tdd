@@ -15,7 +15,7 @@ app.get('/', function (req, res) {
     //http의 req와 res를 한번 래핑한 express의 req와 res객체
   res.send('Hello World!');
 });
-//변경됬나?ㄴㅇㄴㅇ
+//변경됬나?ㄴㅇ
 app.get('/users', function(req, res){
     res.json(users);
 });
