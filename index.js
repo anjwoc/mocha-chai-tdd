@@ -15,9 +15,16 @@ app.get('/', function (req, res) {
     //http의 req와 res를 한번 래핑한 express의 req와 res객체
   res.send('Hello World!');
 });
-//변경됬나?ㄴㅇ
+
+
 app.get('/users', function(req, res){
-    res.json(users);
+    //이 결과 값은 문자열
+    req.query.limit = req.query.limit || 10;//limit이 있으면 그 값을 쓰고 아니면 10
+    const limit = parseInt(req.query.limit, 10); 
+    if(Number.isNaN(limit)){
+      return res.status(400).end();
+    }
+    res.json(users.slice(0, limit));
 });
 
 
