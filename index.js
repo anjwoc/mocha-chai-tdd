@@ -16,7 +16,6 @@ app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
-
 app.get('/users', function(req, res){
     //이 결과 값은 문자열
     req.query.limit = req.query.limit || 10;//limit이 있으면 그 값을 쓰고 아니면 10
@@ -26,7 +25,16 @@ app.get('/users', function(req, res){
     }
     res.json(users.slice(0, limit));
 });
-
+app.get('/users/:id', function(req, res){
+  const id = parseInt(req.params.id, 10);
+  if(Number.isNaN(id)) return res.status(400).end();
+  
+  
+  const user = users.filter((user) => user.id === id)[0];
+  if(!user) return res.status(404).end();
+  //users의 filter는 array가 닮겨서 인덱스 명시
+  res.json(user);
+});
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
