@@ -1,7 +1,11 @@
 var express = require('express');
 //express 모듈을 가져옴
 var app = express();
+var bodyParser = require('body-parser');
 var morgan = require('morgan');
+
+
+
 //express모듈을 가져와서 application 변수에 할당
 var users = [
     {id:1, name: 'alice'},
@@ -9,7 +13,8 @@ var users = [
     {id:3, name: 'chris'}
 ];
 app.use(morgan('dev'));
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.get('/', function (req, res) {
     //여기서의 req와 res는 http의 req와 res가 아닌
     //http의 req와 res를 한번 래핑한 express의 req와 res객체
@@ -35,6 +40,50 @@ app.get('/users/:id', function(req, res){
   //users의 filter는 array가 닮겨서 인덱스 명시
   res.json(user);
 });
+
+app.delete('/users/:id', function(req, res){
+  const id = parseInt(req.params.id, 10);
+  if(Number.isNaN(id)) return res.status(400).end();
+  users = users.filter(user=> user.id !== id);
+  //삭제 할 아이디와 같지 않은 아이디만 필터링해서 users에 넣어줌
+  res.status(204);
+  res.end();
+
+});
+
+
+app.post('/users', (req, res)=>{
+  const name = req.body.name;
+  if(!name) return res.status(400).end();
+  const isConflic = users.filter(user => user.name===name).length;
+  if(isConflic) return res.status(409).end();
+
+  const id = Date.now();
+  const user = {id, name};
+  users.push(user);
+  res.status(201).json(user);
+});
+
+app.put('/users/:id', (req, res)=>{
+  const id = parseInt(req.params.id, 10);
+  if(Number.isNaN(id)) return res.status(400).end();
+
+  const name = req.body.name;
+  
+  if(!name) return res.status(400).end();
+  const user = users.filter(user=> user.id === id)[0];
+  
+  const isConflic = users.filter(user => user.name === name).length;
+  if(isConflic) return res.status(409).end();
+
+  if(!user) return res.status(404).end();
+  user.name = name;
+  res.json(user);
+  
+  
+
+
+})
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
